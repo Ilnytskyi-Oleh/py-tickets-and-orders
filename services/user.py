@@ -1,5 +1,9 @@
+from typing import TYPE_CHECKING
+
 from django.contrib.auth import get_user_model
-from db.models import User
+
+if TYPE_CHECKING:
+    from db.models import User
 
 
 def create_user(
@@ -8,24 +12,22 @@ def create_user(
     email: str = None,
     first_name: str = None,
     last_name: str = None,
-) -> User:
-    user = get_user_model().objects.create_user(
-        username=username,
-        password=password
-    )
+) -> "User":
+    user_data = {
+        "username": username,
+        "password": password,
+    }
     if email:
-        user.email = email
+        user_data["email"] = email
     if first_name:
-        user.first_name = first_name
+        user_data["first_name"] = first_name
     if last_name:
-        user.last_name = last_name
+        user_data["last_name"] = last_name
 
-    if email or first_name or last_name:
-        user.save()
-    return user
+    return get_user_model().objects.create_user(**user_data)
 
 
-def get_user(user_id: int) -> User:
+def get_user(user_id: int) -> "User":
     return get_user_model().objects.get(pk=user_id)
 
 
